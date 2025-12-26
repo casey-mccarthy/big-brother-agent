@@ -3,32 +3,45 @@
 //! Runs as a Windows Service named `InventoryAgent`. Periodically collects inventory data and POSTs
 //! JSON to the configured API endpoint.
 
+#[cfg(target_os = "windows")]
 mod collector;
 mod config;
 mod models;
 mod sender;
+#[cfg(target_os = "windows")]
 mod service;
 
 use anyhow::Result;
+#[cfg(target_os = "windows")]
 use std::time::Duration;
 
 fn main() -> Result<()> {
-    // Check for --test flag for interactive development testing
-    if std::env::args().any(|arg| arg == "--test") {
-        return run_test_mode();
+    #[cfg(not(target_os = "windows"))]
+    {
+        eprintln!("Error: This agent only runs on Windows.");
+        std::process::exit(1);
     }
 
-    // Check for --debug flag for foreground mode with periodic check-ins
-    if std::env::args().any(|arg| arg == "--debug") {
-        return run_debug_mode();
-    }
+    #[cfg(target_os = "windows")]
+    {
+        // Check for --test flag for interactive development testing
+        if std::env::args().any(|arg| arg == "--test") {
+            return run_test_mode();
+        }
 
-    // Service entry point.
-    service::run()
+        // Check for --debug flag for foreground mode with periodic check-ins
+        if std::env::args().any(|arg| arg == "--debug") {
+            return run_debug_mode();
+        }
+
+        // Service entry point.
+        service::run()
+    }
 }
 
 /// Debug mode: run in foreground with periodic check-ins and console output.
 /// Run with: cargo run -- --debug
+#[cfg(target_os = "windows")]
 fn run_debug_mode() -> Result<()> {
     println!("[DEBUG] Starting inventory agent in debug mode...");
 
@@ -82,6 +95,7 @@ fn run_debug_mode() -> Result<()> {
 
 /// Test mode: collect inventory and optionally send to server.
 /// Run with: cargo run -- --test
+#[cfg(target_os = "windows")]
 fn run_test_mode() -> Result<()> {
     println!("=== Inventory Agent Test Mode ===\n");
 
