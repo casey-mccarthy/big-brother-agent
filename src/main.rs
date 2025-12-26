@@ -5,8 +5,11 @@
 
 #[cfg(target_os = "windows")]
 mod collector;
+#[cfg(target_os = "windows")]
 mod config;
+#[cfg(target_os = "windows")]
 mod models;
+#[cfg(target_os = "windows")]
 mod sender;
 #[cfg(target_os = "windows")]
 mod service;
