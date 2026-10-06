@@ -1,3 +1,4 @@
+use chrono::{SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -15,6 +16,12 @@ pub struct CheckIn {
     pub laptop_serial: String,
     pub drives: Vec<Drive>,
     pub timestamp_utc: String,
+}
+
+/// Current time as the `timestamp_utc` wire format: RFC 3339, whole seconds, `Z` suffix
+/// (e.g. `2025-12-18T10:30:00Z`). Fixed width so the server can sort the stored text.
+pub fn utc_now_rfc3339() -> String {
+    Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true)
 }
 
 #[cfg(test)]
