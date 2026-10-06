@@ -1,8 +1,7 @@
 use anyhow::{Context, Result};
-use chrono::Utc;
 use wmi::{COMLibrary, WMIConnection};
 
-use crate::models::{CheckIn, Drive};
+use crate::models::{utc_now_rfc3339, CheckIn, Drive};
 
 pub fn collect() -> Result<CheckIn> {
     let hostname = std::env::var("COMPUTERNAME").unwrap_or_else(|_| "UNKNOWN".to_string());
@@ -67,7 +66,7 @@ pub fn collect() -> Result<CheckIn> {
         logged_in_user,
         laptop_serial,
         drives,
-        timestamp_utc: Utc::now().to_rfc3339(),
+        timestamp_utc: utc_now_rfc3339(),
     })
 }
 
