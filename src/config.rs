@@ -59,8 +59,12 @@ interval_seconds = 1800
 tls_insecure = false
 "#;
 
-    std::fs::write(config_path, template)
-        .with_context(|| format!("failed to write template config to {}", config_path.display()))?;
+    std::fs::write(config_path, template).with_context(|| {
+        format!(
+            "failed to write template config to {}",
+            config_path.display()
+        )
+    })?;
 
     println!("Generated template config file: {}", config_path.display());
     Ok(())
@@ -137,7 +141,10 @@ mod tests {
             tls_insecure = true
         "#;
         let config: Config = toml::from_str(toml).unwrap();
-        assert_eq!(config.api_url, Some("https://server:8443/checkin".to_string()));
+        assert_eq!(
+            config.api_url,
+            Some("https://server:8443/checkin".to_string())
+        );
         assert_eq!(config.interval_seconds, 3600);
         assert_eq!(config.tls_insecure, true);
     }

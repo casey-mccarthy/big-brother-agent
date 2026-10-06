@@ -46,7 +46,10 @@ fn run_debug_mode() -> Result<()> {
     println!("[DEBUG] Starting inventory agent in debug mode...");
 
     let cfg = config::load_config()?;
-    println!("[DEBUG] Check-in interval: {} seconds", cfg.interval_seconds);
+    println!(
+        "[DEBUG] Check-in interval: {} seconds",
+        cfg.interval_seconds
+    );
 
     if let Some(ref url) = cfg.api_url {
         println!("[DEBUG] API URL: {}", url);
@@ -65,7 +68,10 @@ fn run_debug_mode() -> Result<()> {
             match collector::collect() {
                 Ok(checkin) => {
                     println!("[DEBUG] Collected data:");
-                    println!("{}", serde_json::to_string_pretty(&checkin).unwrap_or_default());
+                    println!(
+                        "{}",
+                        serde_json::to_string_pretty(&checkin).unwrap_or_default()
+                    );
 
                     if let Some(ref url) = cfg.api_url {
                         println!("\n[DEBUG] Sending check-in...");
@@ -78,7 +84,10 @@ fn run_debug_mode() -> Result<()> {
                 Err(e) => println!("[DEBUG] Collection failed: {}", e),
             }
 
-            println!("\n[DEBUG] Next check-in in {} seconds. Press Ctrl+C to exit.", cfg.interval_seconds);
+            println!(
+                "\n[DEBUG] Next check-in in {} seconds. Press Ctrl+C to exit.",
+                cfg.interval_seconds
+            );
 
             tokio::select! {
                 _ = tokio::time::sleep(Duration::from_secs(cfg.interval_seconds)) => {}
@@ -115,7 +124,9 @@ fn run_test_mode() -> Result<()> {
         println!("Send successful!");
     } else {
         println!("\nINVENTORY_API_URL not set - skipping send");
-        println!("Set it to test sending: $env:INVENTORY_API_URL=\"http://localhost:8443/checkin\"");
+        println!(
+            "Set it to test sending: $env:INVENTORY_API_URL=\"http://localhost:8443/checkin\""
+        );
     }
 
     Ok(())
