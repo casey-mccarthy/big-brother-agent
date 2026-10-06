@@ -13,7 +13,13 @@ The compiled binary will be at `target/release/inventory-agent.exe`.
 
 ## Configuration
 
-The agent is configured via environment variables. When running as a Windows Service, these are set in the registry by the installer.
+The agent reads `config.toml` from the directory containing the executable (a commented template is generated there on first start if none exists), then applies environment variable overrides. When running as a Windows Service, environment variables are set in the registry by the installer.
+
+```toml
+api_url = "https://server:8443/checkin"
+interval_seconds = 1800
+tls_insecure = false
+```
 
 ### Environment Variables
 
@@ -72,7 +78,7 @@ Collected data:
       "device_id": "\\\\.\\PHYSICALDRIVE0"
     }
   ],
-  "timestamp_utc": "2024-01-15T10:30:00.123456789Z"
+  "timestamp_utc": "2024-01-15T10:30:00Z"
 }
 
 Sending to: http://localhost:8443/checkin
@@ -128,7 +134,7 @@ The agent collects the following information via WMI:
 | `logged_in_user` | `Win32_ComputerSystem.UserName` | Currently logged-in user (DOMAIN\Username) |
 | `laptop_serial` | `Win32_BIOS.SerialNumber` | BIOS/chassis serial number |
 | `drives` | `Win32_DiskDrive` | List of physical drives |
-| `timestamp_utc` | System clock | ISO-8601 UTC timestamp |
+| `timestamp_utc` | System clock | RFC 3339 UTC timestamp, whole seconds, `Z` suffix (e.g. `2024-01-15T10:30:00Z`) |
 
 ### Drive Information
 
@@ -200,7 +206,7 @@ The agent sends the following JSON structure to the server:
    Get-NetFirewallRule -DisplayName "*Inventory*"
    ```
 
-3. **For self-signed certificates in lab environments:**
+3. **Certificate trust:** the agent trusts the Windows certificate store, so a server certificate from your enterprise CA works as long as the CA is installed on the endpoint. For self-signed certificates in lab environments:
    ```powershell
    $env:INVENTORY_TLS_INSECURE = "true"
    ```

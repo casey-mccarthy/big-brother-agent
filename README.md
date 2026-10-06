@@ -25,13 +25,23 @@ Output: `target\release\inventory-agent.exe`
 
 ## Configuration
 
-Set environment variables for the service account (LocalSystem):
+The agent reads `config.toml` from the directory containing the executable, then lets environment variables override it. On first start, if no `config.toml` exists, a commented template is written next to the executable.
+
+```toml
+api_url = "https://server:8443/checkin"
+interval_seconds = 1800
+tls_insecure = false
+```
+
+Environment variables (set for the LocalSystem service account) override the file:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `INVENTORY_API_URL` | Yes | - | Server endpoint URL (e.g., `https://server:8443/checkin`) |
 | `INVENTORY_INTERVAL_SECONDS` | No | 1800 | Check-in interval (30 minutes default) |
 | `INVENTORY_TLS_INSECURE` | No | false | Skip TLS verification (lab environments only) |
+
+TLS certificates are verified against the Windows certificate store, so a server certificate issued by your enterprise CA is trusted without any extra configuration.
 
 ## Installation
 
@@ -64,7 +74,18 @@ sc.exe delete InventoryAgent
 
 ## Development
 
-For interactive testing during development, you can temporarily modify `main.rs` to call `collector::collect()` and `sender::send()` directly instead of using the Windows Service entry point.
+Two flags run the agent in the foreground instead of as a service:
+
+```powershell
+cargo run -- --test    # collect once, print the JSON, send if api_url is set, exit
+cargo run -- --debug   # collect and send on the configured interval until Ctrl+C
+```
+
+### Wire contract with the server
+
+`tests/fixtures/checkin.json` is the canonical check-in payload and is committed identically to the inventory-server repository. `tests/contract.rs` asserts this agent serializes exactly that JSON; the server's `tests/contract.rs` asserts it accepts exactly that JSON. Change the schema on both sides and update the fixture in both repos.
+
+`cargo test` runs on Linux and macOS too: `collector` and `service` are Windows-only, but `models`, `sender`, and `config` are tested everywhere.
 
 ## Architecture
 
