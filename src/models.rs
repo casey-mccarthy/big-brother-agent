@@ -57,13 +57,11 @@ mod tests {
             ip_address: "10.0.0.1".to_string(),
             logged_in_user: None,
             laptop_serial: "SERIAL".to_string(),
-            drives: vec![
-                Drive {
-                    model: "TestDrive".to_string(),
-                    serial_number: None,
-                    device_id: "DEVICE0".to_string(),
-                }
-            ],
+            drives: vec![Drive {
+                model: "TestDrive".to_string(),
+                serial_number: None,
+                device_id: "DEVICE0".to_string(),
+            }],
             timestamp_utc: "2025-12-18T12:00:00Z".to_string(),
         };
 
