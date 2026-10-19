@@ -18,7 +18,7 @@ The Endpoint Inventory Agent is a compiled Windows service that periodically col
   - `model`
   - `serial_number`
   - `device_id` (e.g., \\.\PHYSICALDRIVE0)
-- `timestamp_utc`: ISO-8601 UTC timestamp
+- `timestamp_utc`: RFC 3339 UTC timestamp, whole seconds, `Z` suffix (e.g. `2025-12-18T10:30:00Z`)
 
 ### 2.2 Transmission
 - POST JSON to: `POST https://<server>:<port>/checkin`
